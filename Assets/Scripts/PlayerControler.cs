@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerControler : MonoBehaviour
 {
@@ -44,5 +46,8 @@ public class PlayerControler : MonoBehaviour
         RaycastHit2D siToca = Physics2D.Raycast(transform.position + new Vector3(0f,-2f,0f), Vector2.down, 0.2f);
        return siToca.collider !=  null;
     }
-
+    public void finDeJuego(){
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Time.timeScale = 0;
+    }
 }
