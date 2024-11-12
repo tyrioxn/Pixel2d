@@ -1,76 +1,68 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class EnemyControler : MonoBehaviour
+public class EnemyController : MonoBehaviour
 {
     public float velocidad; 
-    public Vector3 PosicionAbajo;
-    public Vector3 PosicionArriba;
-#region 
-    //public float MaxY;
-    //private float minY = -0.87f;
-#endregion
-    private bool subiendo;
+    public Vector3 PosicionIzquierda;
+    public Vector3 PosicionDerecha;
 
-  
+    private bool moviendoDerecha;
+    private Animator AnimacionEnemigo; // Para controlar la animación del hijo.
+
     void Start()
     {
-        #region 
-        // Inicializa la posición del enemigo en el valor mínimo
-      //  transform.position = new Vector3(transform.position.x, minY, transform.position.z);
-      #endregion
-      Vector3 PosicionAbajo = transform.position;
-             subiendo = true;
-        
+        // Inicializa la posición del enemigo en la posición izquierda.
+        transform.position = PosicionIzquierda;
 
+        // Obtener el componente Animator del hijo.
+        AnimacionEnemigo = GetComponentInChildren<Animator>();
+
+
+        moviendoDerecha = true; // Empieza moviéndose hacia la derecha.
     }
 
     void Update()
     {
-    MoverEnemigo();
-        #region 
-        // Mueve el enemigo hacia arriba o hacia abajo
-        /*if (subiendo)
-        {
-            transform.position += new Vector3(0, velocidad * Time.deltaTime, 0);
-            if (transform.position.y >= MaxY)
-            {
-                subiendo = false; 
-                Debug.Log("1");
-            }
-        }
-        else
-        {
-            transform.position -= new Vector3(0, velocidad * Time.deltaTime, 0);
-            if (transform.position.y <= minY)
-            {
-                subiendo = true;
-            }
-        }
-
-    */
-    #endregion
-    //hace lo mismo que lo comentado
-     
+        MoverEnemigo();
+        AnimarEnemigo();
     }
-    private void OnCollisionEnter2D(Collision2D collision){
-        if(collision.gameObject.CompareTag("Jugador")){
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Jugador"))
+        {
             Debug.Log("menos 1 vida");
-            //se llamara a finDeJuego();
+            // Llamar a finDeJuego() del jugador.
             collision.gameObject.GetComponent<PlayerControler>().finDeJuego();
-    
-        
         }
     }
 
-    private void MoverEnemigo(){
-          Vector3 PosicionDestino = subiendo ? PosicionArriba : PosicionAbajo;
-    transform.position = Vector3.MoveTowards(transform.position,PosicionDestino,velocidad*Time.deltaTime);
-    if (transform.position == PosicionArriba) subiendo = false;
-    else  if (transform.position == PosicionAbajo) subiendo = true;
+    private void MoverEnemigo()
+    {
+        // Determinar la posición de destino dependiendo de la dirección.
+        Vector3 PosicionDestino = moviendoDerecha ? PosicionDerecha : PosicionIzquierda;
+
+        // Mover al enemigo hacia la posición de destino.
+        transform.position = Vector3.MoveTowards(transform.position, PosicionDestino, velocidad * Time.deltaTime);
+
+        // Cambiar la dirección cuando llega a la posición de destino.
+        if (transform.position == PosicionDerecha) moviendoDerecha = false;
+        else if (transform.position == PosicionIzquierda) moviendoDerecha = true;
     }
-   
+
+    private void AnimarEnemigo()
+    {
+        // Si el enemigo se está moviendo
+        if (transform.position != PosicionIzquierda && transform.position != PosicionDerecha)
+        {
+            // Reproducir la animación "enemigo-anda" si está en movimiento
+            AnimacionEnemigo.Play("enemigo-anda");
+           
+        }
+        else {
+            AnimacionEnemigo.Play("enemigo-anda");
+        }
+    }
 }
