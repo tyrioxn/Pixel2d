@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerControler : MonoBehaviour
 {
@@ -16,7 +15,6 @@ public class PlayerControler : MonoBehaviour
 
     private bool vulnerable;
 
-
     // Nueva variable para controlar el tiempo entre disparos
     private float tiempoUltimoDisparo = 0f;
     public float delayDisparo = 1.5f; // Tiempo de espera entre disparos (en segundos)
@@ -27,6 +25,7 @@ public class PlayerControler : MonoBehaviour
         giro = GetComponent<SpriteRenderer>();
         AnimacionJugador = GetComponent<Animator>();
         Puntuacion = 0;
+        vidas = 3; // Inicializa las vidas
         vulnerable = true;
     }
 
@@ -85,8 +84,10 @@ public class PlayerControler : MonoBehaviour
 
     public void finDeJuego()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        Time.timeScale = 0;
+        Debug.Log("Puntuación Final: " + Puntuacion);
+
+        Time.timeScale = 0; 
+
     }
 
     private void AnimarJugador()
@@ -105,26 +106,27 @@ public class PlayerControler : MonoBehaviour
             AnimacionJugador.Play("jugador-salto");
         }
     }
+
     public void IncrementarPuntos(int puntos)
     {
         Puntuacion += puntos;
     }
+
     public void QuitarVidas()
     {
         if (vulnerable)
         {
             vulnerable = false;
             vidas--;
-            if (vidas <= 0)  finDeJuego();
+            if (vidas <= 0) finDeJuego();
             Invoke("HacerVulnerable", 1f);
             giro.color = Color.red;
-        
         }
     }
+
     private void HacerVulnerable()
     {
         vulnerable = true;
         giro.color = Color.white;
     }
-
 }
