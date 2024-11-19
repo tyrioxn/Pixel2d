@@ -494,6 +494,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 798632505685322823, guid: 5720180d7ac37a6448c449911a217bee, type: 3}
+      propertyPath: m_text
+      value: 'Tiempo:'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1300688113871430225, guid: 5720180d7ac37a6448c449911a217bee, type: 3}
+      propertyPath: m_text
+      value: 'Vidas:'
+      objectReference: {fileID: 0}
     - target: {fileID: 1942380676391843258, guid: 5720180d7ac37a6448c449911a217bee, type: 3}
       propertyPath: m_Name
       value: Canvas

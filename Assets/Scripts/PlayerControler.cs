@@ -25,7 +25,7 @@ public class PlayerControler : MonoBehaviour
         giro = GetComponent<SpriteRenderer>();
         AnimacionJugador = GetComponent<Animator>();
         Puntuacion = 0;
-        vidas = 3; // Inicializa las vidas
+       
         vulnerable = true;
     }
 
