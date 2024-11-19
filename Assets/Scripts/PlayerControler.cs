@@ -11,6 +11,11 @@ public class PlayerControler : MonoBehaviour
     private Animator AnimacionJugador;
     public GameObject disparao1;
     private bool disparando = false;
+    public int Puntuacion;
+    public int vidas;
+
+    private bool vulnerable;
+
 
     // Nueva variable para controlar el tiempo entre disparos
     private float tiempoUltimoDisparo = 0f;
@@ -21,6 +26,8 @@ public class PlayerControler : MonoBehaviour
         fisica = GetComponent<Rigidbody2D>();
         giro = GetComponent<SpriteRenderer>();
         AnimacionJugador = GetComponent<Animator>();
+        Puntuacion = 0;
+        vulnerable = true;
     }
 
     // Todas las físicas del juego aquí
@@ -98,4 +105,26 @@ public class PlayerControler : MonoBehaviour
             AnimacionJugador.Play("jugador-salto");
         }
     }
+    public void IncrementarPuntos(int puntos)
+    {
+        Puntuacion += puntos;
+    }
+    public void QuitarVidas()
+    {
+        if (vulnerable)
+        {
+            vulnerable = false;
+            vidas--;
+            if (vidas <= 0)  finDeJuego();
+            Invoke("HacerVulnerable", 1f);
+            giro.color = Color.red;
+        
+        }
+    }
+    private void HacerVulnerable()
+    {
+        vulnerable = true;
+        giro.color = Color.white;
+    }
+
 }

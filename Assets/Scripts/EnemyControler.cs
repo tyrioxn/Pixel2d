@@ -39,13 +39,14 @@ public class EnemyController : MonoBehaviour
         AnimarEnemigo();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Jugador"))
+        if (other.CompareTag("Jugador"))
         {
+             PlayerControler jugador = other.GetComponent<PlayerControler>();
+            jugador.QuitarVidas();
             Debug.Log("menos 1 vida");
             // Llamar a finDeJuego() del jugador.
-            collision.gameObject.GetComponent<PlayerControler>().finDeJuego();
         }
     }
 
