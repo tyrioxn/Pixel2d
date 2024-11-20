@@ -643,6 +643,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7037419195313322325, guid: f9543fe7237161140b3a36936a7781ae, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7917894317383099969, guid: f9543fe7237161140b3a36936a7781ae, type: 3}
       propertyPath: textoPuntos
       value: 
@@ -663,6 +667,10 @@ PrefabInstance:
     - target: {fileID: 778487220837930956, guid: c1a8e4cffd17e2644857ef017cec16b8, type: 3}
       propertyPath: m_Name
       value: Enemy2
+      objectReference: {fileID: 0}
+    - target: {fileID: 778487220837930956, guid: c1a8e4cffd17e2644857ef017cec16b8, type: 3}
+      propertyPath: m_TagString
+      value: Enemigo
       objectReference: {fileID: 0}
     - target: {fileID: 4986473435228769040, guid: c1a8e4cffd17e2644857ef017cec16b8, type: 3}
       propertyPath: m_LocalPosition.x

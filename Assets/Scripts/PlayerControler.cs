@@ -8,7 +8,7 @@ public class PlayerControler : MonoBehaviour
     public float arriba;
     private SpriteRenderer giro;
     private Animator AnimacionJugador;
-    public GameObject disparao1;
+    public GameObject disparao1; // Prefab del disparo
     private bool disparando = false;
     public int Puntuacion;
     public int vidas;
@@ -25,7 +25,7 @@ public class PlayerControler : MonoBehaviour
         giro = GetComponent<SpriteRenderer>();
         AnimacionJugador = GetComponent<Animator>();
         Puntuacion = 0;
-       
+        vidas = 3; // Inicializa vidas si es necesario
         vulnerable = true;
     }
 
@@ -41,21 +41,38 @@ public class PlayerControler : MonoBehaviour
     void Update()
     {
         // Lógica de disparo con delay
-        if (Input.GetKey(KeyCode.Space) && Time.time >= tiempoUltimoDisparo + delayDisparo) // Comprobar si ha pasado el tiempo de espera
-        {
-            // Instancia el proyectil en la posición del jugador y con su rotación
-            Instantiate(disparao1, transform.position, transform.rotation);
-            disparando = true; // Marcar como disparando
-            AnimacionJugador.Play("jugador-disparo"); // Reproducir la animación de disparo
+      if (Input.GetKey(KeyCode.Space) && Time.time >= tiempoUltimoDisparo + delayDisparo) // Comprobar si ha pasado el tiempo de espera
+    {
+        // Instancia el proyectil en la posición del jugador y con su rotación
+        GameObject nuevoDisparo = Instantiate(disparao1, transform.position, transform.rotation);
+        
+        // Establecer la dirección del disparo según la dirección del jugador
+        Vector2 direccionDisparo;
 
-            // Actualiza el tiempo del último disparo
-            tiempoUltimoDisparo = Time.time;
-        }
-        else if (!Input.GetKey(KeyCode.Space))
+        // Comprobar la dirección del jugador
+        if (giro.flipX) // Si el sprite está girado hacia la izquierda
         {
-            disparando = false; // Dejar de disparar
+            direccionDisparo = Vector2.left; // Dispara hacia la izquierda
+        }
+        else
+        {
+            direccionDisparo = Vector2.right; // Dispara hacia la derecha
         }
 
+        nuevoDisparo.GetComponent<Disparo>().SetDireccion(direccionDisparo);
+
+        nuevoDisparo.GetComponent<Disparo>().puntosPorImpacto = 10; // Cambia 10 por el valor que desees
+
+        disparando = true; // Marcar como disparando
+        AnimacionJugador.Play("jugador-disparo"); // Reproducir la animación de disparo
+
+        // Actualiza el tiempo del último disparo
+        tiempoUltimoDisparo = Time.time;
+    }
+    else if (!Input.GetKey(KeyCode.Space))
+    {
+        disparando = false; // Dejar de disparar
+    }
         // ASIGNAMOS TECLA PARA SALTAR
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -85,9 +102,7 @@ public class PlayerControler : MonoBehaviour
     public void finDeJuego()
     {
         Debug.Log("Puntuación Final: " + Puntuacion);
-
-        Time.timeScale = 0; 
-
+        Time.timeScale = 0; // Pausar el juego
     }
 
     private void AnimarJugador()
@@ -109,7 +124,7 @@ public class PlayerControler : MonoBehaviour
 
     public void IncrementarPuntos(int puntos)
     {
-        Puntuacion += puntos;
+        Puntuacion += puntos; // Incrementar la puntuación del jugador
     }
 
     public void QuitarVidas()
@@ -120,13 +135,13 @@ public class PlayerControler : MonoBehaviour
             vidas--;
             if (vidas <= 0) finDeJuego();
             Invoke("HacerVulnerable", 1f);
-            giro.color = Color.red;
+            giro.color = Color.red; // Cambiar color al ser golpeado
         }
     }
 
     private void HacerVulnerable()
     {
-        vulnerable = true;
-        giro.color = Color.white;
+        vulnerable = true; // Restablecer vulnerabilidad
+        giro.color = Color.white; // Restaurar color original
     }
 }
