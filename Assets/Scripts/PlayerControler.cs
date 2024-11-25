@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerControler : MonoBehaviour
 {
@@ -41,38 +42,38 @@ public class PlayerControler : MonoBehaviour
     void Update()
     {
         // Lógica de disparo con delay
-      if (Input.GetKey(KeyCode.Space) && Time.time >= tiempoUltimoDisparo + delayDisparo) // Comprobar si ha pasado el tiempo de espera
-    {
-        // Instancia el proyectil en la posición del jugador y con su rotación
-        GameObject nuevoDisparo = Instantiate(disparao1, transform.position, transform.rotation);
-        
-        // Establecer la dirección del disparo según la dirección del jugador
-        Vector2 direccionDisparo;
-
-        // Comprobar la dirección del jugador
-        if (giro.flipX) // Si el sprite está girado hacia la izquierda
+        if (Input.GetKey(KeyCode.Space) && Time.time >= tiempoUltimoDisparo + delayDisparo) // Comprobar si ha pasado el tiempo de espera
         {
-            direccionDisparo = Vector2.left; // Dispara hacia la izquierda
+            // Instancia el proyectil en la posición del jugador y con su rotación
+            GameObject nuevoDisparo = Instantiate(disparao1, transform.position, transform.rotation);
+            
+            // Establecer la dirección del disparo según la dirección del jugador
+            Vector2 direccionDisparo;
+
+            // Comprobar la dirección del jugador
+            if (giro.flipX) // Si el sprite está girado hacia la izquierda
+            {
+                direccionDisparo = Vector2.left; // Dispara hacia la izquierda
+            }
+            else
+            {
+                direccionDisparo = Vector2.right; // Dispara hacia la derecha
+            }
+
+            nuevoDisparo.GetComponent<Disparo>().SetDireccion(direccionDisparo);
+            nuevoDisparo.GetComponent<Disparo>().puntosPorImpacto = 10; // Cambia 10 por el valor que desees
+
+            disparando = true; // Marcar como disparando
+            AnimacionJugador.Play("jugador-disparo"); // Reproducir la animación de disparo
+
+            // Actualiza el tiempo del último disparo
+            tiempoUltimoDisparo = Time.time;
         }
-        else
+        else if (!Input.GetKey(KeyCode.Space))
         {
-            direccionDisparo = Vector2.right; // Dispara hacia la derecha
+            disparando = false; // Dejar de disparar
         }
 
-        nuevoDisparo.GetComponent<Disparo>().SetDireccion(direccionDisparo);
-
-        nuevoDisparo.GetComponent<Disparo>().puntosPorImpacto = 10; // Cambia 10 por el valor que desees
-
-        disparando = true; // Marcar como disparando
-        AnimacionJugador.Play("jugador-disparo"); // Reproducir la animación de disparo
-
-        // Actualiza el tiempo del último disparo
-        tiempoUltimoDisparo = Time.time;
-    }
-    else if (!Input.GetKey(KeyCode.Space))
-    {
-        disparando = false; // Dejar de disparar
-    }
         // ASIGNAMOS TECLA PARA SALTAR
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -99,11 +100,22 @@ public class PlayerControler : MonoBehaviour
         return siToca.collider != null;
     }
 
-    public void finDeJuego()
-    {
-        Debug.Log("Puntuación Final: " + Puntuacion);
-        Time.timeScale = 0; // Pausar el juego
-    }
+   public void finDeJuego()
+{
+    // Guardar la puntuación final y el estado del jugador (ganado/perdido)
+    PlayerPrefs.SetInt("PuntuacionFinal", Puntuacion);
+    PlayerPrefs.SetInt("HaGanado", vidas > 0 ? 1 : 0); // Si tiene vidas restantes, gana, si no, pierde
+
+    // Mostrar la puntuación final en la consola (opcional)
+    Debug.Log("Puntuación Final: " + Puntuacion);
+
+    // Pausar el juego y cargar la escena de fin de nivel
+    Time.timeScale = 0; // Pausar el juego para dar tiempo de ver el resultado
+
+    // Asegúrate de que el nombre de la escena esté correctamente escrito en Build Settings
+    SceneManager.LoadScene("Menu"); // Cambia "Menu" si tu escena tiene otro nombre
+}
+
 
     private void AnimarJugador()
     {
@@ -133,8 +145,8 @@ public class PlayerControler : MonoBehaviour
         {
             vulnerable = false;
             vidas--;
-            if (vidas <= 0) finDeJuego();
-            Invoke("HacerVulnerable", 1f);
+            if (vidas <= 0) finDeJuego(); // Si las vidas llegan a 0, termina el juego
+            Invoke("HacerVulnerable", 1f); // Reinicia la vulnerabilidad después de 1 segundo
             giro.color = Color.red; // Cambiar color al ser golpeado
         }
     }

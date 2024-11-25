@@ -1,58 +1,73 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+using UnityEngine.SceneManagement; // Para manejar escenas
+using TMPro; // Para trabajar con TextMeshPro
 
 public class GameManager : MonoBehaviour
 {
-    public TextMeshProUGUI textoTemporizador; // Referencia al componente TextMeshProUGUI para el temporizador
-    public TextMeshProUGUI textoVidas; // Referencia al componente TextMeshProUGUI para mostrar las vidas
-    public TextMeshProUGUI textoPuntuacion; // Referencia al componente TextMeshProUGUI para mostrar la puntuación
-    public float tiempoLimite = 60f; // Tiempo en segundos (1 minuto)
-    private bool juegoEnCurso = true; // Estado del juego
+    public TextMeshProUGUI textoTemporador; // Para TextMeshPro
+    public TextMeshProUGUI textoVidas; // Para TextMeshPro
+    public TextMeshProUGUI textoPuntuacion; // Para TextMeshPro
 
-    private PlayerControler jugador; // Referencia al script PlayerControler
+    public float tiempoLimite = 60f;
+    private bool juegoEnCurso = true;
+
+    private PlayerControler jugador;
+    private bool haGanado;
 
     void Start()
     {
-        jugador = FindObjectOfType<PlayerControler>(); // Encuentra el script PlayerControler
-        ActualizarTextoTemporador(tiempoLimite); // Muestra el tiempo inicial
-        ActualizarTextoVidas(); // Actualiza el texto de vidas al inicio
-        ActualizarTextoPuntuacion(); // Actualiza el texto de puntuación al inicio
+        // Verificar que las referencias a los componentes TextMeshProUGUI estén asignadas en el Inspector
+        if (textoTemporador == null || textoVidas == null || textoPuntuacion == null)
+        {
+            Debug.LogError("Uno o más componentes TextMeshProUGUI no están asignados en el Inspector.");
+        }
+
+        // Obtener el componente PlayerControler
+        jugador = FindObjectOfType<PlayerControler>();
+
+        if (jugador == null)
+        {
+            Debug.LogError("No se ha encontrado un PlayerControler en la escena.");
+        }
+
+        // Actualizar los textos iniciales
+        ActualizarTextoTemporador(tiempoLimite);
+        ActualizarTextoVidas();
+        ActualizarTextoPuntuacion();
     }
 
     void Update()
     {
         if (juegoEnCurso)
         {
-            tiempoLimite -= Time.deltaTime; // Resta el tiempo transcurrido
+            tiempoLimite -= Time.deltaTime;
 
             if (tiempoLimite <= 0)
             {
-                tiempoLimite = 0; // Asegúrate de que no se vuelva negativo
-                FinDelJuego(); // Llama a la función para terminar el juego
+                tiempoLimite = 0;
+                haGanado = false;
+                FinDelJuego();
             }
 
-            ActualizarTextoTemporador(tiempoLimite); // Actualiza el texto del temporizador
-            VerificarPowerUpsRestantes(); // Verifica si quedan power-ups en la escena
-            ActualizarTextoVidas(); // Actualiza el texto de vidas en cada frame
-            ActualizarTextoPuntuacion(); // Actualiza el texto de puntuación en cada frame
+            ActualizarTextoTemporador(tiempoLimite);
+            VerificarPowerUpsRestantes();
+            ActualizarTextoVidas();
+            ActualizarTextoPuntuacion();
         }
     }
 
-      private void ActualizarTextoTemporador(float tiempo)
-{
-    int minutos = Mathf.FloorToInt(tiempo / 60); // Calcula los minutos
-    int segundos = Mathf.FloorToInt(tiempo % 60); // Calcula los segundos
+    private void ActualizarTextoTemporador(float tiempo)
+    {
+        int minutos = Mathf.FloorToInt(tiempo / 60);
+        int segundos = Mathf.FloorToInt(tiempo % 60);
+        textoTemporador.text = $"Tiempo: {minutos}:{segundos:00}";
+    }
 
-    // Formatea el texto para que siempre muestre dos dígitos en los segundos
-    textoTemporizador.text = string.Format("Tiempo: {0}:{1:00}", minutos, segundos);
-}
     private void ActualizarTextoVidas()
     {
         if (jugador != null)
         {
-            textoVidas.text = "Vidas: " + jugador.vidas.ToString(); // Actualiza el texto con el número de vidas
+            textoVidas.text = "Vidas: " + jugador.vidas.ToString();
         }
     }
 
@@ -60,47 +75,36 @@ public class GameManager : MonoBehaviour
     {
         if (jugador != null)
         {
-            textoPuntuacion.text = "Puntuación: " + jugador.Puntuacion.ToString(); // Actualiza el texto con la puntuación del jugador
+            textoPuntuacion.text = "Puntuación: " + jugador.Puntuacion.ToString();
         }
     }
 
     private void FinDelJuego()
     {
-        if (!juegoEnCurso) return; // Evita que se ejecute más de una vez
+        if (!juegoEnCurso) return;
 
-        juegoEnCurso = false; // Cambia el estado del juego a no en curso
+        juegoEnCurso = false;
 
-        // Suma el tiempo restante a la puntuación
         if (jugador != null)
         {
-            jugador.IncrementarPuntos((int)tiempoLimite); // Suma el tiempo restante a la puntuación
-            jugador.finDeJuego(); // Asegúrate de que haya un método finDeJuego en PlayerControler
+            jugador.IncrementarPuntos((int)tiempoLimite);
         }
+
+        haGanado = jugador != null && jugador.vidas > 0;
+
+        PlayerPrefs.SetInt("PuntuacionFinal", jugador.Puntuacion);
+        PlayerPrefs.SetInt("HaGanado", haGanado ? 1 : 0);
+
+        SceneManager.LoadScene("FinNivel");
     }
 
     private void VerificarPowerUpsRestantes()
     {
-        // Busca todos los objetos con la etiqueta "PowerUp"
         GameObject[] powerUps = GameObject.FindGameObjectsWithTag("PowerUp");
-
-        // Si no quedan power-ups, detén el juego
         if (powerUps.Length == 0)
         {
-            FinDelJuego(); // Llama a la función para terminar el juego
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Jugador"))
-        {
-            // Aquí puedes hacer que el jugador recoja el power-up
-            int puntosPowerup = 10; // Define cuántos puntos da el power-up
-            other.gameObject.GetComponent<PlayerControler>().IncrementarPuntos(puntosPowerup);
-            Destroy(gameObject); // Destruye el power-up al recogerlo
-
-            // Verifica si quedan power-ups en la escena
-            VerificarPowerUpsRestantes();
+            haGanado = true;
+            FinDelJuego();
         }
     }
 }
