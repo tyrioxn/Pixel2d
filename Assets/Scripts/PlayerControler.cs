@@ -1,9 +1,14 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+[RequireComponent(typeof(AudioSource))]
 public class PlayerControler : MonoBehaviour
 {
+    public AudioClip Laser_Shoot_ogg;
+    public AudioClip hit;
+    public AudioClip jump;
+    private AudioSource audioSource;
+    #region 
     public float velocidad;
     private Rigidbody2D fisica;
     public float arriba;
@@ -15,11 +20,12 @@ public class PlayerControler : MonoBehaviour
     public int vidas;
 
     private bool vulnerable;
-
+    #endregion
     // Nueva variable para controlar el tiempo entre disparos
     private float tiempoUltimoDisparo = 0f;
     public float delayDisparo = 1.5f; // Tiempo de espera entre disparos (en segundos)
 
+    void Awake(){  audioSource = GetComponent<AudioSource>(); }
     void Start()
     {
         fisica = GetComponent<Rigidbody2D>();
@@ -44,6 +50,7 @@ public class PlayerControler : MonoBehaviour
         // Lógica de disparo con delay
         if (Input.GetKey(KeyCode.Space) && Time.time >= tiempoUltimoDisparo + delayDisparo) // Comprobar si ha pasado el tiempo de espera
         {
+            audioSource.PlayOneShot(Laser_Shoot_ogg, 0.7F);
             // Instancia el proyectil en la posición del jugador y con su rotación
             GameObject nuevoDisparo = Instantiate(disparao1, transform.position, transform.rotation);
             
@@ -72,11 +79,13 @@ public class PlayerControler : MonoBehaviour
         else if (!Input.GetKey(KeyCode.Space))
         {
             disparando = false; // Dejar de disparar
+            
         }
 
         // ASIGNAMOS TECLA PARA SALTAR
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
+            audioSource.PlayOneShot(jump, 0.7F);
             // AÑADIMOS FUERZA DE SALTO
             if (Suelo()) fisica.AddForce(Vector2.up * arriba, ForceMode2D.Impulse);
         }
@@ -143,6 +152,8 @@ public class PlayerControler : MonoBehaviour
     {
         if (vulnerable)
         {
+            audioSource.PlayOneShot(hit, 0.7F);
+
             vulnerable = false;
             vidas--;
             if (vidas <= 0) finDeJuego(); // Si las vidas llegan a 0, termina el juego

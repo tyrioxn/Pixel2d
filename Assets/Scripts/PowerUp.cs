@@ -4,17 +4,29 @@ using UnityEngine;
 
 public class PowerUp : MonoBehaviour
 {
+    public AudioClip powerup; // Clip de sonido del power-up
     public int puntosPowerup;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Jugador"))
         {
-            other.gameObject.GetComponent<PlayerControler>().IncrementarPuntos(puntosPowerup);
-            Destroy(gameObject);
-
-            // Verifica si quedan power-ups en la escena
-            VerificarPowerUpsRestantes();
+            // Obtén la referencia al PlayerControler
+            PlayerControler jugador = other.gameObject.GetComponent<PlayerControler>();
+            if (jugador != null)
+            {
+                // Incrementa los puntos del jugador
+                jugador.IncrementarPuntos(puntosPowerup);
+                
+                // Reproduce el sonido del power-up usando el AudioSource del PlayerControler
+                jugador.GetComponent<AudioSource>().PlayOneShot(powerup, 0.7F);
+                
+                // Destruye el objeto power-up
+                Destroy(gameObject);
+                
+                // Verifica si quedan power-ups en la escena
+                VerificarPowerUpsRestantes();
+            }
         }
     }
 

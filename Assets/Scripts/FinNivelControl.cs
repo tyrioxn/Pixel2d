@@ -10,7 +10,7 @@ public class ControlFinNivel : MonoBehaviour
         int puntuacion = PlayerPrefs.GetInt("PuntuacionFinal", 0);
         bool haGanado = PlayerPrefs.GetInt("HaGanado", 0) == 1;
 
-        string mensaje = haGanado ? "HAS GANADO!" : "UPS... HAS PERDIDO";
+        string mensaje = haGanado ? "'¡'HAS GANADO!" : "UPS... HAS PERDIDO";
         mensaje += $"\nPUNTUACIÓN: {puntuacion}";
 
         mensajeFinalTxt.text = mensaje;
